@@ -24,4 +24,4 @@ You can run the gui application after installing the `requirements.txt` by runni
 python app/gui_v2.py
 ```
 
-If something doesn't work, feel free to let me know! :)
+The classification will probably not work well, since there are none of my pretrained weights. They're too big for GitHub. I will upload somewhere them soon and update it here.
