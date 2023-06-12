@@ -20,8 +20,11 @@ This repository has just been created. I doubt it runs smoothly for everyone eve
 
 You can run the gui application after installing the `requirements.txt` by running
 
-```bash
-python app/gui_v2.py
-```
 
-The classification will probably not work well, since there are none of my pretrained weights. They're too big for GitHub. I will upload somewhere them soon and update it here.
+To have successful classification, you of course need to have the pre-trained weights for the model. You will find them [here](https://drive.google.com/file/d/1M2y5-pq6S2rZP6y00y5KQ5wn27J2RMgr/view?usp=sharing).
+
+Once you have the weights saved on your machine, you can run the program:
+
+```bash
+python app/gui_v2.py --yolo path/to/yolo/weights --resnet path/to/resnet/weights
+```
