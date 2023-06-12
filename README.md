@@ -15,3 +15,13 @@ git clone https://github.com/ultralytics/yolov5
 cd yolov5
 pip install -r requirements.txt
 ```
+
+This repository has just been created. I doubt it runs smoothly for everyone everywhere but I will soon extend this to make it more accessible for more people.
+
+You can run the gui application after installing the `requirements.txt` by running
+
+```bash
+python app/gui_v2.py
+```
+
+The classification will probably not work well, since there are none of my pretrained weights. They're too big for GitHub. I will upload somewhere them soon and update it here.
