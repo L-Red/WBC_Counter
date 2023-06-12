@@ -6,7 +6,7 @@ from app import image_splitting
 
 
 class TwoStageDetector(object):
-    def __init__(self, model_name='yolo'):
+    def __init__(self, yolo_path, resnet_path, model_name='yolo'):
         if model_name == 'rcnn':
             self.model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights='DEFAULT')
             # load weights
@@ -15,7 +15,7 @@ class TwoStageDetector(object):
                            map_location=device))
         elif model_name == 'yolo':
             # Load the saved file
-            self.model = torch.hub.load('../yolov5', 'custom', path='../yolov5/runs/euler/exp/weights/best.pt',
+            self.model = torch.hub.load('../yolov5', 'custom', path=yolo_path,
                                    source='local')  # local model
         if torch.cuda.is_available():
             self.device = torch.device('cuda')
@@ -28,7 +28,7 @@ class TwoStageDetector(object):
         self.resnet = torchvision.models.resnet50()
         num_ftrs = self.resnet.fc.in_features
         self.resnet.fc = torch.nn.Linear(num_ftrs, len(self.idx2name.keys()))
-        self.resnet.load_state_dict(torch.load('../torch_rcnn_try/runs/run15_last_resnet/resnet50_best.pt', map_location=self.device))
+        self.resnet.load_state_dict(torch.load(resnet_path, map_location=self.device))
 
     def __call__(self, *args, **kwargs):
         return self.detect(*args, **kwargs)

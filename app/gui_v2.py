@@ -17,6 +17,17 @@ from torch.nn.functional import softmax
 
 import image_splitting  # the module containing the image processing function
 from app.workers import ClassificationWorker, StitchWorker
+import argparse
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--yolo', type=str, required=True)
+parser.add_argument('--resnet', type=str, required=True)
+
+args = parser.parse_args()
+
+resnet_model_path = args.resnet
+yolo_model_path = args.yolo
 
 IMAGE_WIDTH = 1200
 IMAGE_HEIGHT = 800
@@ -169,7 +180,7 @@ class MainWindow(QMainWindow):
     def count_cells(self):
         try:
             image = cv2.cvtColor(self.image_cv, cv2.COLOR_BGR2RGB)
-            self.worker = ClassificationWorker(image, self.original_image_size)
+            self.worker = ClassificationWorker(image, self.original_image_size, resnet=resnet_model_path, yolo=yolo_model_path)
             self.worker.signal_pixmap.connect(self.display_image)
             self.worker.signal_progress.connect(self.progress.setValue)
             self.worker.signal_boxes_labels.connect(self.draw_boxes_labels)

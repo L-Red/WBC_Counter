@@ -22,8 +22,11 @@ adjacent to each other. Right now, we are dependent on the stitching library.
 import stitching
 stitcher = stitching.Stitcher()
 
-def stitch(image_list):
-    '''
-    This function stitches images together. It takes in a list of images and returns a stitched image.
-    '''
-    return stitcher.stitch(image_list)
+
+class MyStitcher(stitching.Stitcher):
+
+    def __int__(self):
+        super(MyStitcher, self).__init__()
+
+    def __call__(self, *args, **kwargs):
+        return self.stitch(*args, **kwargs)

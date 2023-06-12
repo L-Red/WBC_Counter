@@ -8,7 +8,7 @@ from torch.nn.functional import softmax
 
 from app import image_splitting
 from app.two_stage_detector import TwoStageDetector
-from image_stitching.stitching import stitch
+from image_stitching.stitching import MyStitcher
 
 if torch.cuda.is_available():
     device = torch.device('cuda')
@@ -16,20 +16,20 @@ else:
     device = torch.device('cpu')
 
 MODEL_NAME = 'yolo'
-if MODEL_NAME == 'rcnn':
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights='DEFAULT')
-    #load weights
-    model.load_state_dict(torch.load('../torch_rcnn_try/runs/run7_noweights/model_run4_balance_v2_80_noweights.pt', map_location=device))
-elif MODEL_NAME == 'yolo':
-    # Load the saved file
-    model = torch.hub.load('../yolov5', 'custom', path='../yolov5/runs/euler/exp1/weights/best.pt', source='local')  # local model
+# if MODEL_NAME == 'rcnn':
+#     model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights='DEFAULT')
+#     #load weights
+#     model.load_state_dict(torch.load('../torch_rcnn_try/runs/run7_noweights/model_run4_balance_v2_80_noweights.pt', map_location=device))
+# elif MODEL_NAME == 'yolo':
+#     # Load the saved file
+#     model = torch.hub.load('../yolov5', 'custom', path='../yolov5/runs/euler/exp1/weights/best.pt', source='local')  # local model
 
 idx2name = image_splitting.get_idx2name()
 
-resnet = torchvision.models.resnet50()
-num_ftrs = resnet.fc.in_features
-resnet.fc = torch.nn.Linear(num_ftrs, len(idx2name.keys()))
-resnet.load_state_dict(torch.load('../torch_rcnn_try/runs/run15_last_resnet/resnet50_best.pt', map_location=device))
+# resnet = torchvision.models.resnet50()
+# num_ftrs = resnet.fc.in_features
+# resnet.fc = torch.nn.Linear(num_ftrs, len(idx2name.keys()))
+# resnet.load_state_dict(torch.load('../torch_rcnn_try/runs/run15_last_resnet/resnet50_best.pt', map_location=device))
 
 
 class StitchWorker(QThread):
@@ -40,11 +40,13 @@ class StitchWorker(QThread):
     def __init__(self, image_paths):
         QThread.__init__(self)
         self.image_paths = image_paths
+        self.stitcher = MyStitcher()
 
     def run(self):
         try:
+            print("Stitching images...")
             # Assuming you have a function stitch_images in your image_splitting module
-            stitched_image = stitch(self.image_paths)
+            stitched_image = self.stitcher(self.image_paths)
 
             # Convert the stitched image to QImage
             stitched_image_cv = cv2.cvtColor(stitched_image, cv2.COLOR_BGR2RGB)
@@ -62,12 +64,12 @@ class ClassificationWorker(QThread):
     signal_counts = pyqtSignal(int, dict)
     signal_finish = pyqtSignal()
 
-    def __init__(self, image, original_image_size, model_name=MODEL_NAME):
+    def __init__(self, image, original_image_size, resnet, yolo, model_name=MODEL_NAME):
         QThread.__init__(self)
         self.image = image
         self.original_image_size = original_image_size
         self.model_name = model_name
-        self.two_stage_detector = TwoStageDetector(model_name=model_name)
+        self.two_stage_detector = TwoStageDetector(yolo_path=yolo, resnet_path=resnet)
 
 
     def run(self):
