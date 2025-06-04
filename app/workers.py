@@ -1,3 +1,5 @@
+"""workers.py: This file defines the worker threads for the PyQT6 front end appliction. It launches the different subroutines necessary for the blood cell count."""
+
 import cv2
 import torch
 import torchvision
