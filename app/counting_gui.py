@@ -1,3 +1,7 @@
+"""
+counting_gui.py: In this code, we implement running the model from the front-end PyQt6 application. 
+It let's the user open an image, it blocks usage during inference and updates the final image with the resulting bounding boxes after.
+"""
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
