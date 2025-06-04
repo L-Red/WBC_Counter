@@ -1,3 +1,10 @@
+"""image_splitting.py: This file defines various function to the splitting and reconstruction of large images. It includes:
+- splitting a large image into a grid of smaller ones
+- creating feature pyramids by sampling at different resoltions
+- running inference on different resolutions
+- combining boxes detected at different scales and neighbouring image patches
+"""
+
 import math
 
 import cv2
