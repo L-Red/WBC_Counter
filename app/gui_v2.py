@@ -1,3 +1,7 @@
+"""gui_v2.py: An updated front end application to visualize the blood cell counts from inputs of microscope imaging data. 
+It visualizes both the location and types of the white blood cells to the user. 
+From this file, we define windows and call worker threads to run the underlying code."""
+
 from pathlib import Path
 
 import numpy as np
