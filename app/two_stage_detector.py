@@ -1,3 +1,8 @@
+"""
+two_stage_detector.py: In this file, we define our two stage detector model. 
+It can either be instatiated with a YOLO or a Faster RCNN backend. It outputs bounding boxes, classes and confidence scores to the caller.
+"""
+
 import torch
 import torchvision
 from torch.nn.functional import softmax
