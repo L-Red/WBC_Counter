@@ -1,8 +1,10 @@
 """
-two_stage_detector.py: In this file, we define our two stage detector model. 
+two_stage_detector.py: In this file, we define our two stage detector model.
 It can either be instatiated with a YOLO or a Faster RCNN backend. It outputs bounding boxes, classes and confidence scores to the caller.
 """
 
+import os
+from pathlib import Path
 import torch
 import torchvision
 from torch.nn.functional import softmax
@@ -11,21 +13,40 @@ from app import image_splitting
 
 
 class TwoStageDetector(object):
-    def __init__(self, yolo_path, resnet_path, model_name='yolo'):
-        if model_name == 'rcnn':
-            self.model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights='DEFAULT')
-            # load weights
-            self.model.load_state_dict(
-                torch.load('../torch_rcnn_try/runs/run7_noweights/model_run4_balance_v2_80_noweights.pt',
-                           map_location=device))
-        elif model_name == 'yolo':
-            # Load the saved file
-            self.model = torch.hub.load('../yolov5', 'custom', path=yolo_path,
-                                   source='local')  # local model
+    def __init__(self, yolo_path, resnet_path, model_name='yolo', yolo_repo_path=None):
+        # Set device first
         if torch.cuda.is_available():
             self.device = torch.device('cuda')
         else:
             self.device = torch.device('cpu')
+
+        if model_name == 'rcnn':
+            self.model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights='DEFAULT')
+            # Load weights if provided
+            if os.path.exists(yolo_path):  # Using yolo_path for rcnn weights for backward compatibility
+                self.model.load_state_dict(
+                    torch.load(yolo_path, map_location=self.device))
+        elif model_name == 'yolo':
+            # Determine YOLOv5 repository path
+            if yolo_repo_path is None:
+                # Try to find yolov5 directory relative to project root
+                project_root = Path(__file__).parent.parent
+                yolo_repo_path = project_root / 'yolov5'
+
+                # If not found, try parent directory
+                if not yolo_repo_path.exists():
+                    yolo_repo_path = project_root.parent / 'yolov5'
+
+                if not yolo_repo_path.exists():
+                    raise FileNotFoundError(
+                        f"YOLOv5 repository not found. Please clone it with:\n"
+                        f"git clone https://github.com/ultralytics/yolov5\n"
+                        f"Or specify yolo_repo_path parameter."
+                    )
+
+            # Load the saved file
+            self.model = torch.hub.load(str(yolo_repo_path), 'custom', path=yolo_path,
+                                   source='local')  # local model
 
         self.idx2name = image_splitting.get_idx2name()
         self.model_name = model_name
